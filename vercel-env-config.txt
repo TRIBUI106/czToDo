@@ -1,0 +1,28 @@
+# Vercel Environment Variables
+# Copy và paste vào Vercel Dashboard > Settings > Environment Variables
+
+# 1. DATABASE_URL
+# Lấy từ Neon Console > Connection String
+DATABASE_URL=postgresql://username:password@ep-xxx.region.aws.neon.tech/database?sslmode=require
+
+# 2. NEXTAUTH_URL  
+# Lấy từ Vercel Dashboard sau khi deploy lần đầu
+NEXTAUTH_URL=https://your-app-name.vercel.app
+
+# 3. NEXTAUTH_SECRET (Generated)
+# Secret an toàn được tạo tự động
+NEXTAUTH_SECRET=v0NwT7ZENP8k7uLKbkw/9QuiqL1TRA947WMJ+fDY5uM=
+
+# Backup secrets (nếu cần):
+# NEXTAUTH_SECRET_BACKUP=CzTodo2025!ProductionSecret#Safe$Key
+# NEXTAUTH_SECRET_SIMPLE=cz-todo-production-secret-2025-random-string
+
+# Hướng dẫn Deploy:
+# 1. Vào https://vercel.com
+# 2. Import GitHub repo: TRIBUI106/czToDo  
+# 3. Deploy lần đầu (sẽ fail nhưng có URL)
+# 4. Copy URL từ Vercel Dashboard
+# 5. Set 3 environment variables trên
+# 6. Redeploy
+# 7. Tạo database trên Neon.tech
+# 8. Chạy database migration
