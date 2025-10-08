@@ -3,11 +3,11 @@
 
 # 1. DATABASE_URL
 # Lấy từ Neon Console > Connection String
-DATABASE_URL=postgresql://username:password@ep-xxx.region.aws.neon.tech/database?sslmode=require
+DATABASE_URL=postgresql://neondb_owner:npg_gJnR1KyN8lrE@ep-damp-voice-a1wbayug-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 
 # 2. NEXTAUTH_URL  
 # Lấy từ Vercel Dashboard sau khi deploy lần đầu
-NEXTAUTH_URL=https://your-app-name.vercel.app
+NEXTAUTH_URL=https://cz-to-do.vercel.app/
 
 # 3. NEXTAUTH_SECRET (Generated)
 # Secret an toàn được tạo tự động
