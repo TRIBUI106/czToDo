@@ -98,7 +98,7 @@ export default function MigratePage() {
           )}
 
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            <p><strong>Step 1:</strong> Click "Run Migration" to create database tables</p>
+            <p><strong>Step 1:</strong> Click &quot;Run Migration&quot; to create database tables</p>
             <p><strong>Step 2:</strong> Check <a href="/api/health" className="text-blue-500 hover:underline" target="_blank">/api/health</a> to verify</p>
             <p><strong>Step 3:</strong> Try <a href="/auth/register" className="text-blue-500 hover:underline">registration</a> if migration succeeds</p>
           </div>
