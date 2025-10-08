@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { Plus, LogOut, Trash2, Check, X, Edit2 } from "lucide-react"
+import { Plus, LogOut, Trash2, Check, X, Edit2, FileText } from "lucide-react"
 
 interface Todo {
   id: string
@@ -193,6 +193,14 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/api-docs')}
+              className="flex items-center gap-2"
+            >
+              <FileText className="h-4 w-4" />
+              API Docs
+            </Button>
             <ThemeToggle />
             <Button
               variant="outline"
