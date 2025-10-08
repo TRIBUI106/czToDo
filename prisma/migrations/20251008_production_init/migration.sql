@@ -22,9 +22,9 @@ CREATE TABLE "Todo" (
     "priority" "Priority" NOT NULL DEFAULT 'MEDIUM',
     "category" TEXT,
     "dueDate" TIMESTAMP(3),
+    "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "userId" TEXT NOT NULL,
 
     CONSTRAINT "Todo_pkey" PRIMARY KEY ("id")
 );
@@ -40,6 +40,9 @@ CREATE INDEX "Todo_completed_idx" ON "Todo"("completed");
 
 -- CreateIndex
 CREATE INDEX "Todo_priority_idx" ON "Todo"("priority");
+
+-- CreateIndex
+CREATE INDEX "Todo_dueDate_idx" ON "Todo"("dueDate");
 
 -- AddForeignKey
 ALTER TABLE "Todo" ADD CONSTRAINT "Todo_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
