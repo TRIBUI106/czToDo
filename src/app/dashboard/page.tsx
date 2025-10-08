@@ -193,14 +193,14 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button
+            {/* <Button
               variant="outline"
               onClick={() => router.push('/api-docs')}
               className="flex items-center gap-2"
             >
-              {/* <FileText className="h-4 w-4" />
-              API Docs */}
-            </Button>
+              <FileText className="h-4 w-4" />
+              API Docs
+            </Button> */}
             <ThemeToggle />
             <Button
               variant="outline"
