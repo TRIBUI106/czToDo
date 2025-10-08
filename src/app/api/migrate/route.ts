@@ -21,7 +21,13 @@ export async function POST(req: NextRequest) {
 
     console.log("📦 Running prisma migrate deploy...")
     
-    // Run migration
+    // First generate Prisma client
+    await execAsync('npx prisma generate', {
+      env: { ...process.env },
+      timeout: 15000,
+    })
+    
+    // Then run migration
     const { stdout, stderr } = await execAsync('npx prisma migrate deploy', {
       env: { ...process.env },
       timeout: 30000, // 30 seconds timeout
