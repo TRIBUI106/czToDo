@@ -77,6 +77,20 @@ export const storage = {
     await chrome.storage.local.set({ syncQueue: filtered });
   },
 
+  async updateSyncQueueItem(
+    id: string,
+    updates: Partial<SyncQueueItem>
+  ): Promise<void> {
+    const queue = await this.getSyncQueue();
+    const index = queue.findIndex(item => item.id === id);
+    if (index !== -1) {
+      queue[index] = { ...queue[index], ...updates };
+      await chrome.storage.local.set({
+        syncQueue: queue,
+      });
+    }
+  },
+
   async getOnlineStatus(): Promise<boolean> {
     const result = await chrome.storage.local.get('isOnline');
     return result.isOnline !== false; // default to online
