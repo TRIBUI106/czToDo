@@ -174,11 +174,117 @@ async function processQueueItem(item: SyncQueueItem) {
 }
 
 /**
+ * Sync assigned GitHub issues.
+ */
+async function syncGitHubIssues() {
+  try {
+    const githubToken = await storage.getGitHubToken();
+    if (!githubToken) {
+      return; // No token configured
+    }
+
+    if (!supabaseClient) {
+      await initializeSupabase();
+    }
+
+    const { data: { user } } = await supabaseClient!.auth.getUser();
+    if (!user) {
+      return;
+    }
+
+    // Fetch assigned issues from GitHub
+    const response = await fetch(
+      'https://api.github.com/user/issues?state=open&per_page=100',
+      {
+        headers: {
+          'Authorization': `token ${githubToken}`,
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.error(
+        'GitHub API error:',
+        response.status,
+        response.statusText
+      );
+      return;
+    }
+
+    const issues = (await response.json()) as Array<{
+      id: number;
+      number: number;
+      title: string;
+      body?: string;
+      repository?: { full_name: string };
+      html_url: string;
+    }>;
+
+    const syncStatus = await storage.getGitHubSyncStatus();
+    const processed = syncStatus.processedIssueIds || [];
+
+    for (const issue of issues) {
+      const issueId = `github-${issue.id}`;
+
+      // Skip if already processed
+      if (processed.includes(issueId)) {
+        continue;
+      }
+
+      // Check if already in Supabase
+      const { data: existing } = await supabaseClient!
+        .from('todos')
+        .select('id')
+        .eq('github_issue_id', issue.html_url)
+        .single();
+
+      if (existing) {
+        processed.push(issueId);
+        continue;
+      }
+
+      // Create todo for new issue
+      const fullName = issue.repository?.full_name || 'GitHub';
+      const newTodo: Partial<Todo> = {
+        title: `[${fullName}] ${issue.title}`,
+        description: issue.body?.substring(0, 500),
+        source_url: issue.html_url,
+        source_type: 'github',
+        github_issue_id: issue.html_url,
+        status: 'active',
+        priority: 'high',
+      };
+
+      const { error } = await supabaseClient!
+        .from('todos')
+        .insert([newTodo]);
+
+      if (!error) {
+        processed.push(issueId);
+      }
+    }
+
+    // Update sync status
+    await storage.setGitHubSyncStatus({
+      lastSyncAt: Date.now(),
+      processedIssueIds: processed.slice(-1000), // Keep last 1000
+    });
+  } catch (err) {
+    console.error('GitHub sync error:', err);
+  }
+}
+
+/**
  * Register Chrome alarm for periodic sync.
  */
 function setupAlarms() {
   chrome.alarms.create('sync_queue', {
     periodInMinutes: 1,
+  });
+
+  chrome.alarms.create('github_sync', {
+    periodInMinutes: 30,
   });
 }
 
@@ -346,6 +452,23 @@ async function handleMessage(message: Message): Promise<any> {
       return data;
     }
 
+    case 'SET_GITHUB_TOKEN': {
+      const { token } = message.payload;
+      await storage.setGitHubToken(token || null);
+
+      if (token) {
+        // Trigger immediate sync
+        await syncGitHubIssues();
+      }
+
+      return { success: true };
+    }
+
+    case 'GET_GITHUB_TOKEN': {
+      const token = await storage.getGitHubToken();
+      return { token: !!token };
+    }
+
     default:
       throw new Error(`Unknown message type: ${message.type}`);
   }
@@ -358,6 +481,10 @@ chrome.alarms.onAlarm.addListener(alarm => {
   if (alarm.name === 'sync_queue') {
     processSyncQueue().catch(err =>
       console.error('Sync queue processing failed:', err)
+    );
+  } else if (alarm.name === 'github_sync') {
+    syncGitHubIssues().catch(err =>
+      console.error('GitHub sync failed:', err)
     );
   }
 });

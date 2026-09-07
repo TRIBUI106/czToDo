@@ -10,7 +10,9 @@ export type MessageType =
   | 'LOGOUT'
   | 'CAPTURE_TEXT'
   | 'GITHUB_ISSUE'
-  | 'ADD_GITHUB';
+  | 'ADD_GITHUB'
+  | 'SET_GITHUB_TOKEN'
+  | 'GET_GITHUB_TOKEN';
 
 export interface Message<T = any> {
   type: MessageType;

@@ -82,6 +82,18 @@ module.exports = (_environment, arguments_) => {
   return [
     {
       ...common,
+      name: 'options',
+      entry: './extension/options/index.ts',
+      output: {
+        path: outputPath,
+        filename: 'options.js',
+      },
+      module: {
+        rules: [createTypeScriptRule(/\.ts$/)],
+      },
+    },
+    {
+      ...common,
       name: 'popup',
       entry: './extension/popup/index.tsx',
       output: {

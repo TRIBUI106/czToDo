@@ -99,4 +99,41 @@ export const storage = {
   async setOnlineStatus(isOnline: boolean): Promise<void> {
     await chrome.storage.local.set({ isOnline });
   },
+
+  async getGitHubToken(): Promise<string | null> {
+    const result = await chrome.storage.local.get('githubToken') as {
+      githubToken?: string;
+    };
+    return result.githubToken || null;
+  },
+
+  async setGitHubToken(token: string | null): Promise<void> {
+    if (token) {
+      await chrome.storage.local.set({ githubToken: token });
+    } else {
+      await chrome.storage.local.remove('githubToken');
+    }
+  },
+
+  async getGitHubSyncStatus(): Promise<{
+    lastSyncAt?: number;
+    processedIssueIds?: string[];
+  }> {
+    const result = await chrome.storage.local.get(
+      'githubSyncStatus'
+    ) as {
+      githubSyncStatus?: {
+        lastSyncAt?: number;
+        processedIssueIds?: string[];
+      };
+    };
+    return result.githubSyncStatus || {};
+  },
+
+  async setGitHubSyncStatus(status: {
+    lastSyncAt?: number;
+    processedIssueIds?: string[];
+  }): Promise<void> {
+    await chrome.storage.local.set({ githubSyncStatus: status });
+  },
 };
