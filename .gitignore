@@ -15,11 +15,6 @@
 
 # production
 /build
-/extension/dist/
-
-# local agent state
-/.omc/
-/.superpowers/
 
 # misc
 .DS_Store

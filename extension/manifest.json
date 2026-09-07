@@ -6,7 +6,6 @@
   "permissions": [
     "storage",
     "contextMenus",
-    "alarms",
     "scripting",
     "activeTab"
   ],
@@ -21,10 +20,6 @@
       "48": "assets/icons/icon-48.png",
       "128": "assets/icons/icon-128.png"
     }
-  },
-  "options_ui": {
-    "page": "options/index.html",
-    "open_in_tab": true
   },
   "background": {
     "service_worker": "dist/background.js",

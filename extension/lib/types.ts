@@ -29,8 +29,6 @@ export interface SyncQueueItem {
   data: Partial<Todo>;
   timestamp: number;
   retries: number;
-  next_attempt_at?: number;
-  last_error?: string;
 }
 
 export interface ExtensionState {
