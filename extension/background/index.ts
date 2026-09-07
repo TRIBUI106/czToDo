@@ -291,6 +291,61 @@ async function handleMessage(message: Message): Promise<any> {
       return { success: true };
     }
 
+    case 'CAPTURE_TEXT': {
+      const { text, url, title, description, domain } =
+        message.payload;
+
+      if (!supabaseClient) throw new Error('Not initialized');
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const newTodo: Partial<Todo> = {
+        title: text.substring(0, 200) || title || 'Captured text',
+        description: text.length > 200 ? text : undefined,
+        source_url: url,
+        source_type: 'context_menu',
+        status: 'active',
+        priority: 'medium',
+      };
+
+      const { data, error } = await supabaseClient
+        .from('todos')
+        .insert([newTodo])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
+
+    case 'ADD_GITHUB': {
+      const { title, description, url, github_issue_id, type } =
+        message.payload;
+
+      if (!supabaseClient) throw new Error('Not initialized');
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const newTodo: Partial<Todo> = {
+        title: title.substring(0, 200),
+        description,
+        source_url: url,
+        source_type: 'github',
+        github_issue_id,
+        status: 'active',
+        priority: 'high',
+      };
+
+      const { data, error } = await supabaseClient
+        .from('todos')
+        .insert([newTodo])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
+
     default:
       throw new Error(`Unknown message type: ${message.type}`);
   }
@@ -308,8 +363,99 @@ chrome.alarms.onAlarm.addListener(alarm => {
 });
 
 /**
+ * Register context menu items once.
+ * Idempotent: safely called multiple times.
+ */
+function registerContextMenus() {
+  // Clear existing menus
+  chrome.contextMenus.removeAll(() => {
+    // Add "Add to czToDo" for text selection
+    chrome.contextMenus.create({
+      id: 'add-selected-text',
+      title: 'Add selected text to czToDo',
+      contexts: ['selection'],
+    });
+
+    // Add "Add to czToDo" for links
+    chrome.contextMenus.create({
+      id: 'add-link',
+      title: 'Add link to czToDo',
+      contexts: ['link'],
+    });
+
+    // Add "Add to czToDo" for page
+    chrome.contextMenus.create({
+      id: 'add-page',
+      title: 'Add this page to czToDo',
+      contexts: ['page'],
+    });
+  });
+}
+
+/**
+ * Handle context menu clicks.
+ */
+chrome.contextMenus.onClicked.addListener(
+  async (info: chrome.contextMenus.OnClickData) => {
+    try {
+      if (!supabaseClient) {
+        await initializeSupabase();
+      }
+
+      const { data: { user } } = await supabaseClient!.auth.getUser();
+      if (!user) {
+        console.warn('User not authenticated for context menu action');
+        return;
+      }
+
+      let title = '';
+      let sourceUrl = '';
+      let sourceType: 'context_menu' | 'popup' | 'github' | 'email' =
+        'context_menu';
+
+      if (info.menuItemId === 'add-selected-text') {
+        title = info.selectionText || '';
+        sourceUrl = info.pageUrl || '';
+      } else if (info.menuItemId === 'add-link') {
+        title = info.linkUrl || '';
+        sourceUrl = info.linkUrl || '';
+      } else if (info.menuItemId === 'add-page') {
+        title = 'Page';
+        sourceUrl = info.pageUrl || '';
+      }
+
+      if (!title.trim()) {
+        console.warn('No title for context menu action');
+        return;
+      }
+
+      const newTodo: Partial<Todo> = {
+        title: title.substring(0, 500),
+        source_url: sourceUrl,
+        source_type: sourceType,
+        status: 'active',
+        priority: 'medium',
+      };
+
+      const { error } = await supabaseClient!
+        .from('todos')
+        .insert([newTodo]);
+
+      if (error) {
+        console.error('Failed to add todo from context menu:', error);
+      }
+    } catch (err) {
+      console.error('Context menu handler error:', err);
+    }
+  }
+);
+
+/**
  * Initialize on service worker startup.
  */
 initializeSupabase()
-  .then(() => setupAlarms())
+  .then(() => {
+    setupAlarms();
+    registerContextMenus();
+  })
   .catch(err => console.error('Initialization failed:', err));
