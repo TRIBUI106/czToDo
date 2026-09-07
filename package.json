@@ -7,6 +7,7 @@
     "build": "prisma generate && next build",
     "build:extension": "webpack --config webpack.extension.js --mode production",
     "dev:extension": "webpack watch --config webpack.extension.js --mode development",
+    "typecheck:extension": "tsc --project tsconfig.extension.json --noEmit",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
@@ -16,7 +17,7 @@
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset --force",
     "supabase:migrate": "supabase migration up --local",
-    "supabase:link": "supabase link --project-ref <your-project-ref>"
+    "supabase:link": "supabase link"
   },
   "dependencies": {
     "@prisma/client": "^6.17.0",
@@ -35,7 +36,7 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
-    "@supabase/cli": "^1.0.0",
+    "supabase": "^2.116.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/chrome": "^0.2.9",
     "@types/node": "^20.0.0",
@@ -45,7 +46,7 @@
     "@types/swagger-ui-react": "^4.18.3",
     "autoprefixer": "^10.4.14",
     "css-loader": "^7.1.5",
-    "dotenv-webpack": "^9.0.0",
+    "dotenv": "^17.4.2",
     "eslint": "^8.0.0",
     "eslint-config-next": "14.2.13",
     "postcss": "^8.4.24",

@@ -4,37 +4,45 @@ import { AuthToken, ExtensionState, SyncQueueItem, Todo } from './types';
 
 // Chrome storage helpers
 export const storage = {
-  // Sync storage (cross-device)
+  // Supabase is the cross-device source of truth; its cache stays device-local.
   async getTodos(): Promise<Todo[]> {
-    const result = await chrome.storage.sync.get('todos');
+    const result = await chrome.storage.local.get('todos') as {
+      todos?: Todo[];
+    };
     return result.todos || [];
   },
 
   async setTodos(todos: Todo[]): Promise<void> {
-    await chrome.storage.sync.set({ todos });
+    await chrome.storage.local.set({ todos });
   },
 
   async setSyncStatus(status: ExtensionState['syncStatus']): Promise<void> {
-    await chrome.storage.sync.set({ syncStatus: status });
+    await chrome.storage.local.set({ syncStatus: status });
   },
 
   async getSyncStatus(): Promise<ExtensionState['syncStatus']> {
-    const result = await chrome.storage.sync.get('syncStatus');
+    const result = await chrome.storage.local.get('syncStatus') as {
+      syncStatus?: ExtensionState['syncStatus'];
+    };
     return result.syncStatus || 'synced';
   },
 
   async setLastSyncTime(time: number): Promise<void> {
-    await chrome.storage.sync.set({ lastSyncTime: time });
+    await chrome.storage.local.set({ lastSyncTime: time });
   },
 
   async getLastSyncTime(): Promise<number> {
-    const result = await chrome.storage.sync.get('lastSyncTime');
+    const result = await chrome.storage.local.get('lastSyncTime') as {
+      lastSyncTime?: number;
+    };
     return result.lastSyncTime || 0;
   },
 
   // Local storage (device-specific)
   async getAuthToken(): Promise<AuthToken | null> {
-    const result = await chrome.storage.local.get('authToken');
+    const result = await chrome.storage.local.get('authToken') as {
+      authToken?: AuthToken;
+    };
     return result.authToken || null;
   },
 
@@ -47,7 +55,9 @@ export const storage = {
   },
 
   async getSyncQueue(): Promise<SyncQueueItem[]> {
-    const result = await chrome.storage.local.get('syncQueue');
+    const result = await chrome.storage.local.get('syncQueue') as {
+      syncQueue?: SyncQueueItem[];
+    };
     return result.syncQueue || [];
   },
 
