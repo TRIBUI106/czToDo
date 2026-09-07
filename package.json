@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
+    "build:extension": "webpack --config webpack.extension.js --mode production",
+    "dev:extension": "webpack watch --config webpack.extension.js --mode development",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
@@ -35,17 +37,24 @@
   "devDependencies": {
     "@supabase/cli": "^1.0.0",
     "@types/bcryptjs": "^2.4.6",
+    "@types/chrome": "^0.2.9",
     "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-react": "^4.18.3",
     "autoprefixer": "^10.4.14",
+    "css-loader": "^7.1.5",
+    "dotenv-webpack": "^9.0.0",
     "eslint": "^8.0.0",
     "eslint-config-next": "14.2.13",
     "postcss": "^8.4.24",
     "prisma": "^6.17.0",
+    "style-loader": "^4.0.0",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.0.0"
+    "ts-loader": "^9.6.2",
+    "typescript": "^5.0.0",
+    "webpack": "^5.110.3",
+    "webpack-cli": "^7.2.3"
   }
 }
