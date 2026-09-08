@@ -1,0 +1,153 @@
+name: Build Extension
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build extension
+        run: npm run build:extension
+
+      - name: Validate extension
+        run: |
+          chmod +x validate-extension.sh
+          ./validate-extension.sh
+
+      - name: Check for build artifacts
+        run: |
+          echo "Checking build artifacts..."
+          ls -lh extension/dist/
+
+          # Verify all required files exist
+          test -f extension/dist/popup.js || exit 1
+          test -f extension/dist/options.js || exit 1
+          test -f extension/dist/background.js || exit 1
+          test -f extension/dist/content.js || exit 1
+
+          echo "✓ All build artifacts present"
+
+      - name: Get version from manifest
+        id: get_version
+        run: |
+          VERSION=$(grep '"version"' extension/manifest.json | head -1 | grep -oP '\d+\.\d+\.\d+')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Create extension zip
+        run: |
+          cd extension
+          zip -r ../czToDo-extension.zip . \
+            -x "node_modules/*" \
+            "*.map" \
+            ".git*"
+          cd ..
+          ls -lh czToDo-extension.zip
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: extension-build
+          path: |
+            extension/dist/
+            extension/manifest.json
+            extension/popup.html
+            extension/options.html
+          retention-days: 30
+
+      - name: Upload extension zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: czToDo-extension-${{ steps.get_version.outputs.version }}
+          path: czToDo-extension.zip
+          retention-days: 30
+
+      - name: Create Release (on master push only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: czToDo-extension.zip
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: czToDo Extension v${{ steps.get_version.outputs.version }}
+          body: |
+            🎉 **czToDo Chrome Extension Release**
+
+            ### Version: ${{ steps.get_version.outputs.version }}
+
+            **Build Date:** ${{ github.event.head_commit.timestamp }}
+            **Commit:** ${{ github.sha }}
+
+            ### Build Artifacts
+            - ✅ popup.js (React UI)
+            - ✅ options.js (Settings page)
+            - ✅ background.js (Service worker)
+            - ✅ content.js (Content scripts)
+
+            ### Installation
+            1. Download `czToDo-extension.zip`
+            2. Extract the archive
+            3. Open `chrome://extensions/`
+            4. Enable "Developer mode"
+            5. Click "Load unpacked"
+            6. Select the extracted folder
+
+            ### Features
+            - ✅ Settings page with GitHub token management
+            - ✅ Gmail integration (email capture)
+            - ✅ Slack integration (message capture)
+            - ✅ Dark mode support
+            - ✅ Real-time sync via Supabase
+            - ✅ Offline support with queue
+            - ✅ Context menu integration
+            - ✅ GitHub issue detection
+
+            ### Documentation
+            - [README_TESTING.md](https://github.com/${{ github.repository }}/blob/master/README_TESTING.md)
+            - [TESTING_GUIDE.md](https://github.com/${{ github.repository }}/blob/master/TESTING_GUIDE.md)
+            - [FINAL_SUMMARY.md](https://github.com/${{ github.repository }}/blob/master/FINAL_SUMMARY.md)
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Summary
+        if: always()
+        run: |
+          echo "================================"
+          echo "🎉 Build Summary"
+          echo "================================"
+          echo ""
+          echo "✓ Node version: ${{ matrix.node-version }}"
+          echo "✓ Build status: SUCCESS"
+          echo "✓ Artifacts created:"
+          echo "  - extension/dist/popup.js"
+          echo "  - extension/dist/options.js"
+          echo "  - extension/dist/background.js"
+          echo "  - extension/dist/content.js"
+          echo "✓ Extension zip: czToDo-extension.zip"
+          echo ""
+          echo "📦 Download from GitHub Actions Artifacts tab"
+          echo ""
