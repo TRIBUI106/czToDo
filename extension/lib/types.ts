@@ -8,7 +8,7 @@ export interface Todo {
   status: 'active' | 'completed' | 'archived';
   priority?: 'low' | 'medium' | 'high';
   source_url?: string;
-  source_type?: 'popup' | 'context_menu' | 'github' | 'email';
+  source_type?: 'popup' | 'context_menu' | 'github' | 'email' | 'slack';
   github_issue_id?: string;
   created_at: string;
   updated_at: string;
@@ -29,6 +29,7 @@ export interface SyncQueueItem {
   data: Partial<Todo>;
   timestamp: number;
   retries: number;
+  next_attempt_at?: number;
 }
 
 export interface ExtensionState {

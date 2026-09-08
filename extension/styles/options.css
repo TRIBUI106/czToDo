@@ -1,0 +1,39 @@
+/* Additional styles for options page */
+
+body {
+  overflow-y: auto;
+}
+
+.message-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+code {
+  background-color: var(--color-bg-secondary);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+}
+
+/* Ensure proper display of sections */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px 16px;
+  }
+
+  .settings-section {
+    padding: 16px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
+}

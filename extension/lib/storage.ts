@@ -75,4 +75,44 @@ export const storage = {
   async setOnlineStatus(isOnline: boolean): Promise<void> {
     await chrome.storage.local.set({ isOnline });
   },
+
+  async getGitHubToken(): Promise<string | null> {
+    const result = await chrome.storage.local.get('githubToken');
+    return result.githubToken || null;
+  },
+
+  async setGitHubToken(token: string | null): Promise<void> {
+    if (token) {
+      await chrome.storage.local.set({ githubToken: token });
+    } else {
+      await chrome.storage.local.remove('githubToken');
+    }
+  },
+
+  async getGitHubSyncStatus(): Promise<{
+    lastSyncAt?: number;
+    processedIssueIds?: string[];
+  }> {
+    const result = await chrome.storage.local.get('githubSyncStatus');
+    return result.githubSyncStatus || {};
+  },
+
+  async setGitHubSyncStatus(status: {
+    lastSyncAt?: number;
+    processedIssueIds?: string[];
+  }): Promise<void> {
+    await chrome.storage.local.set({ githubSyncStatus: status });
+  },
+
+  async updateSyncQueueItem(
+    id: string,
+    updates: Partial<SyncQueueItem>
+  ): Promise<void> {
+    const queue = await this.getSyncQueue();
+    const index = queue.findIndex(item => item.id === id);
+    if (index !== -1) {
+      queue[index] = { ...queue[index], ...updates };
+      await chrome.storage.local.set({ syncQueue: queue });
+    }
+  },
 };

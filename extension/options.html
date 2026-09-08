@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>czToDo Settings</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --color-primary: #3b82f6;
+      --color-success: #10b981;
+      --color-error: #ef4444;
+      --color-warning: #f59e0b;
+      --color-border: #e5e7eb;
+      --color-bg: #ffffff;
+      --color-bg-secondary: #f9fafb;
+      --color-text: #1f2937;
+      --color-text-light: #6b7280;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #1f2937;
+        --color-bg-secondary: #111827;
+        --color-text: #f3f4f6;
+        --color-text-light: #d1d5db;
+        --color-border: #374151;
+      }
+    }
+
+    html {
+      height: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+      font-size: 14px;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    header {
+      margin-bottom: 40px;
+      border-bottom: 2px solid var(--color-border);
+      padding-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--color-text-light);
+      font-size: 14px;
+    }
+
+    .settings-section {
+      margin-bottom: 40px;
+      padding: 24px;
+      background-color: var(--color-bg-secondary);
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+    }
+
+    .settings-section h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--color-text);
+    }
+
+    .settings-section p {
+      color: var(--color-text-light);
+      font-size: 13px;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      color: var(--color-text);
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 12px;
+    }
+
+    .form-help {
+      color: var(--color-text-light);
+      font-size: 12px;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 18px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: #2563eb;
+      border-color: #2563eb;
+    }
+
+    .btn-danger {
+      background-color: var(--color-error);
+      color: white;
+      border-color: var(--color-error);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background-color: #dc2626;
+      border-color: #dc2626;
+    }
+
+    .btn-success {
+      background-color: var(--color-success);
+      color: white;
+      border-color: var(--color-success);
+    }
+
+    .message {
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.success {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--color-success);
+      border: 1px solid var(--color-success);
+    }
+
+    .message.error {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--color-error);
+      border: 1px solid var(--color-error);
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toggle input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .info-box {
+      background-color: rgba(59, 130, 246, 0.05);
+      border: 1px solid var(--color-primary);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      color: var(--color-text);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .section-divider {
+      height: 1px;
+      background-color: var(--color-border);
+      margin: 24px 0;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background-color: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .status-dot.online {
+      background-color: var(--color-success);
+    }
+
+    .status-dot.offline {
+      background-color: var(--color-error);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>czToDo Settings</h1>
+      <p>Manage your extension preferences and integrations</p>
+    </header>
+
+    <div id="message-container"></div>
+
+    <div id="root"></div>
+  </div>
+
+  <script src="dist/options.js"></script>
+</body>
+</html>

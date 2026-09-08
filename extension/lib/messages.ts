@@ -9,7 +9,12 @@ export type MessageType =
   | 'LOGIN'
   | 'LOGOUT'
   | 'CAPTURE_TEXT'
-  | 'GITHUB_ISSUE';
+  | 'GITHUB_ISSUE'
+  | 'CAPTURE_EMAIL'
+  | 'CAPTURE_SLACK_MESSAGE'
+  | 'ADD_GITHUB'
+  | 'SET_GITHUB_TOKEN'
+  | 'GET_GITHUB_TOKEN';
 
 export interface Message<T = any> {
   type: MessageType;
