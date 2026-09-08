@@ -23,8 +23,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '20.x'
           cache: 'npm'
+        env:
+          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: 'true'
 
       - name: Install dependencies
         run: npm install
@@ -93,8 +95,28 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: Create Release (on master push only)
+      - name: Check if release exists
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        id: check_release
+        run: |
+          VERSION="v${{ steps.get_version.outputs.version }}"
+          echo "Checking if release $VERSION exists..."
+
+          if gh release view "$VERSION" > /dev/null 2>&1; then
+            echo "Release exists, will skip creation"
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Release does not exist, will create"
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release (on master push only)
+        if: |
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/master' &&
+          steps.check_release.outputs.exists == 'false'
         uses: softprops/action-gh-release@v1
         with:
           files: czToDo-extension.zip
