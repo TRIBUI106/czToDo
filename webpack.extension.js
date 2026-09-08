@@ -55,7 +55,16 @@ module.exports = [
       rules: [
         {
           test: /\.ts$/,
-          use: 'ts-loader',
+          use: {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+              compilerOptions: {
+                module: 'esnext',
+                target: 'es2020',
+              },
+            },
+          },
           exclude: /node_modules/,
         },
       ],
@@ -81,7 +90,16 @@ module.exports = [
       rules: [
         {
           test: /\.ts$/,
-          use: 'ts-loader',
+          use: {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+              compilerOptions: {
+                module: 'esnext',
+                target: 'es2020',
+              },
+            },
+          },
           exclude: /node_modules/,
         },
       ],
