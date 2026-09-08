@@ -1,6 +1,8 @@
-# Personal Todo List
+# czToDo - Chrome Extension + Web App
 
-A complete and user-friendly personal todo list application built with Next.js 14, featuring user authentication, modern UI, and database persistence.
+A complete personal todo list application with Chrome Extension, Web App, and real-time sync via Supabase.
+
+**📚 Full Documentation:** See [@docs/INDEX.md](@docs/INDEX.md)
 
 ## ✨ Features
 
@@ -24,6 +26,20 @@ A complete and user-friendly personal todo list application built with Next.js 1
 - **UI Components**: Custom components built with Radix primitives
 - **Icons**: Lucide React
 - **Deployment**: Vercel
+
+## 📚 Documentation
+
+All documentation is organized in the [@docs/](@docs/) directory:
+
+### Quick Links
+- **Getting Started:** [@docs/QUICK_START.md](@docs/QUICK_START.md)
+- **Chrome Extension Testing:** [@docs/CHROME_TESTING_START.md](@docs/CHROME_TESTING_START.md)
+- **Full Testing Guide:** [@docs/TESTING_GUIDE.md](@docs/TESTING_GUIDE.md)
+- **Project Summary:** [@docs/FINAL_SUMMARY.md](@docs/FINAL_SUMMARY.md)
+- **CI/CD Setup:** [@docs/CI_CD_SETUP.md](@docs/CI_CD_SETUP.md)
+- **Documentation Index:** [@docs/INDEX.md](@docs/INDEX.md)
+
+See [@docs/INDEX.md](@docs/INDEX.md) for complete documentation index.
 
 ## 🛠️ Installation & Setup
 
