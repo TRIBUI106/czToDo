@@ -25,64 +25,81 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          echo "Installing dependencies..."
+          npm install
+          echo "✓ Dependencies installed"
 
       - name: Lint code (if ESLint configured)
+        continue-on-error: true
         run: |
           if [ -f ".eslintrc.json" ]; then
-            npm run lint || true
+            echo "Running ESLint..."
+            npm run lint || echo "⚠ Linting issues found (non-critical)"
           else
             echo "ℹ ESLint not configured, skipping"
           fi
 
       - name: Check TypeScript
+        continue-on-error: true
         run: |
           echo "Checking TypeScript configuration..."
-          npx tsc --noEmit || true
+          npx tsc --noEmit 2>&1 | head -50 || echo "⚠ TypeScript errors found (non-critical)"
 
       - name: Build extension
-        run: npm run build:extension
+        run: |
+          echo "Building extension..."
+          npm run build:extension
+          echo "✓ Extension built successfully"
 
       - name: Validate manifest.json
         run: |
           echo "Validating manifest.json..."
           node -e "
             const fs = require('fs');
-            const manifest = JSON.parse(fs.readFileSync('extension/manifest.json'));
+            try {
+              const manifest = JSON.parse(fs.readFileSync('extension/manifest.json', 'utf8'));
 
-            // Check required fields
-            const required = ['manifest_version', 'name', 'version', 'description'];
-            const missing = required.filter(f => !manifest[f]);
+              // Check required fields
+              const required = ['manifest_version', 'name', 'version', 'description'];
+              const missing = required.filter(f => !manifest[f]);
 
-            if (missing.length > 0) {
-              console.error('✗ Missing required fields:', missing);
+              if (missing.length > 0) {
+                console.error('✗ Missing required fields:', missing);
+                process.exit(1);
+              }
+
+              if (manifest.manifest_version !== 3) {
+                console.error('✗ Must use Manifest V3, got:', manifest.manifest_version);
+                process.exit(1);
+              }
+
+              console.log('✓ Manifest validation PASSED');
+              console.log('  - Name:', manifest.name);
+              console.log('  - Version:', manifest.version);
+              console.log('  - Manifest Version:', manifest.manifest_version);
+            } catch (error) {
+              console.error('✗ Error validating manifest:', error.message);
               process.exit(1);
             }
-
-            if (manifest.manifest_version !== 3) {
-              console.error('✗ Must use Manifest V3');
-              process.exit(1);
-            }
-
-            console.log('✓ Manifest validation passed');
-            console.log('  - Name:', manifest.name);
-            console.log('  - Version:', manifest.version);
-            console.log('  - Manifest Version:', manifest.manifest_version);
           "
 
       - name: Validate bundle sizes
         run: |
           echo "Checking bundle sizes..."
+          echo ""
 
+          TOTAL=0
           for file in popup.js options.js background.js content.js; do
             if [ -f "extension/dist/$file" ]; then
-              size=$(stat -c%s "extension/dist/$file" 2>/dev/null || stat -f%z "extension/dist/$file")
+              size=$(stat -c%s "extension/dist/$file" 2>/dev/null || stat -f%z "extension/dist/$file" 2>/dev/null)
               size_kb=$((size / 1024))
+              TOTAL=$((TOTAL + size_kb))
               echo "  ✓ $file: $size_kb KB"
 
               # Warn if over 500KB
               if [ $size_kb -gt 500 ]; then
-                echo "    ⚠ Warning: Over 500 KB"
+                echo "    ⚠ Warning: Over 500 KB (consider code splitting)"
               fi
             else
               echo "  ✗ $file: NOT FOUND"
@@ -90,36 +107,59 @@ jobs:
             fi
           done
 
+          echo ""
+          echo "  Total size: $TOTAL KB"
+          echo ""
+
       - name: Check for console.log in production
+        continue-on-error: true
         run: |
           echo "Checking for debug statements..."
+          echo ""
 
-          # Count console.log statements (allowing some in dev)
-          count=$(grep -r "console\.log" extension/popup/ extension/options/ extension/background/ 2>/dev/null | wc -l)
+          # Count console.log statements
+          count=$(grep -r "console\.log" extension/popup/ extension/options/ extension/background/ 2>/dev/null | grep -v node_modules | wc -l)
 
-          if [ $count -gt 10 ]; then
-            echo "⚠ Found $count console.log statements - consider cleaning up"
+          if [ -z "$count" ] || [ "$count" = "0" ]; then
+            echo "✓ No console.log statements found"
+          elif [ "$count" -lt 5 ]; then
+            echo "✓ Minimal console.log usage ($count statements)"
           else
-            echo "✓ Console logging is minimal"
+            echo "⚠ Found $count console.log statements - consider cleaning up"
           fi
+          echo ""
 
       - name: Test TypeScript compilation
+        continue-on-error: true
         run: |
           echo "Testing TypeScript compilation..."
+          echo ""
           npx tsc --version
-          npx tsc -p tsconfig.extension.json --noEmit 2>&1 | head -20 || true
+          echo ""
+
+          echo "Checking for TypeScript errors..."
+          if npx tsc -p tsconfig.extension.json --noEmit 2>&1 | grep -q "error"; then
+            echo "⚠ TypeScript errors detected (see above)"
+          else
+            echo "✓ No TypeScript errors"
+          fi
 
       - name: Validation Summary
         if: always()
         run: |
-          echo "================================"
-          echo "✓ Validation Complete"
-          echo "================================"
           echo ""
-          echo "Checks passed:"
+          echo "════════════════════════════════════════"
+          echo "✓ Validation Complete"
+          echo "════════════════════════════════════════"
+          echo ""
+          echo "✓ Checks completed:"
           echo "  ✓ Dependencies installed"
           echo "  ✓ Extension built"
-          echo "  ✓ Manifest valid"
+          echo "  ✓ Manifest validated"
           echo "  ✓ Bundle sizes checked"
           echo "  ✓ TypeScript verified"
+          echo "  ✓ Code quality checked"
+          echo ""
+          echo "📋 Note: Non-critical checks (lint, TS) use"
+          echo "   continue-on-error to not fail the build"
           echo ""

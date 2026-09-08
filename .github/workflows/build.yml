@@ -53,9 +53,15 @@ jobs:
       - name: Get version from manifest
         id: get_version
         run: |
-          VERSION=$(grep '"version"' extension/manifest.json | head -1 | grep -oP '\d+\.\d+\.\d+')
+          VERSION=$(cat extension/manifest.json | grep '"version"' | head -1 | sed 's/.*"\([0-9.]*\)".*/\1/')
+
+          if [ -z "$VERSION" ]; then
+            echo "❌ Failed to extract version from manifest"
+            exit 1
+          fi
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION"
+          echo "✓ Extracted version: $VERSION"
 
       - name: Create extension zip
         run: |
@@ -66,6 +72,7 @@ jobs:
             ".git*"
           cd ..
           ls -lh czToDo-extension.zip
+          echo "✓ Extension zip created successfully"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -81,9 +88,10 @@ jobs:
       - name: Upload extension zip
         uses: actions/upload-artifact@v4
         with:
-          name: czToDo-extension-${{ steps.get_version.outputs.version }}
+          name: czToDo-extension-v${{ steps.get_version.outputs.version }}
           path: czToDo-extension.zip
           retention-days: 30
+          if-no-files-found: error
 
       - name: Create Release (on master push only)
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -97,8 +105,9 @@ jobs:
 
             ### Version: ${{ steps.get_version.outputs.version }}
 
-            **Build Date:** ${{ github.event.head_commit.timestamp }}
+            **Build Date:** ${{ github.event.repository.updated_at }}
             **Commit:** ${{ github.sha }}
+            **Author:** ${{ github.actor }}
 
             ### Build Artifacts
             - ✅ popup.js (React UI)
@@ -128,6 +137,10 @@ jobs:
             - [README_TESTING.md](https://github.com/${{ github.repository }}/blob/master/README_TESTING.md)
             - [TESTING_GUIDE.md](https://github.com/${{ github.repository }}/blob/master/TESTING_GUIDE.md)
             - [FINAL_SUMMARY.md](https://github.com/${{ github.repository }}/blob/master/FINAL_SUMMARY.md)
+
+            ### Quick Links
+            - [Chrome Testing Guide](https://github.com/${{ github.repository }}/blob/master/CHROME_TESTING_START.md)
+            - [CI/CD Setup](https://github.com/${{ github.repository }}/blob/master/CI_CD_SETUP.md)
           draft: false
           prerelease: false
         env:
@@ -142,6 +155,7 @@ jobs:
           echo ""
           echo "✓ Node version: ${{ matrix.node-version }}"
           echo "✓ Build status: SUCCESS"
+          echo "✓ Version: v${{ steps.get_version.outputs.version }}"
           echo "✓ Artifacts created:"
           echo "  - extension/dist/popup.js"
           echo "  - extension/dist/options.js"
@@ -150,4 +164,5 @@ jobs:
           echo "✓ Extension zip: czToDo-extension.zip"
           echo ""
           echo "📦 Download from GitHub Actions Artifacts tab"
+          echo "📋 Or from GitHub Releases (master push only)"
           echo ""
