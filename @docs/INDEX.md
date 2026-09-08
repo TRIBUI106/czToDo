@@ -27,6 +27,8 @@
 
 ### 🗄️ Database & Backend
 - **[DATABASE_SETUP.md](DATABASE_SETUP.md)** - Database configuration guide
+- **[DATA_SYNC_ANALYSIS.md](DATA_SYNC_ANALYSIS.md)** - Web & extension sync analysis (⚠️ Currently NOT synced)
+- **[DATA_SYNC_IMPLEMENTATION.md](DATA_SYNC_IMPLEMENTATION.md)** - Step-by-step migration to unified Supabase
 
 ### 🌐 Internationalization
 - **[README_VI.md](README_VI.md)** - Vietnamese documentation
@@ -49,6 +51,8 @@
 ├── GITHUB_ACTIONS_FIXES.md
 ├── BUILD_FIXES_NODE_RELEASE.md
 ├── DATABASE_SETUP.md
+├── DATA_SYNC_ANALYSIS.md (new)
+├── DATA_SYNC_IMPLEMENTATION.md (new)
 └── README_VI.md
 ```
 
@@ -81,8 +85,8 @@
 
 ## ✅ Documentation Statistics
 
-- Total files: 12
-- Total lines: 4000+
+- Total files: 14 (added DATA_SYNC_ANALYSIS.md, DATA_SYNC_IMPLEMENTATION.md)
+- Total lines: 5000+
 - Coverage: Complete
 - Last updated: September 8, 2026
 
