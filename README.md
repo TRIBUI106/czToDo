@@ -142,25 +142,35 @@ npx prisma migrate deploy
 ## 🗂️ Project Structure
 
 ```
-src/
-├── app/                    # Next.js App Router
-│   ├── api/               # API routes
-│   │   ├── auth/          # Authentication endpoints
-│   │   └── todos/         # Todo CRUD endpoints
-│   ├── auth/              # Authentication pages
-│   ├── dashboard/         # Main todo dashboard
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Home page
-├── components/            # Reusable components
-│   ├── ui/               # UI components
-│   ├── providers.tsx     # Context providers
-│   └── theme-toggle.tsx  # Theme switcher
-├── lib/                  # Utility libraries
-│   ├── auth.ts          # NextAuth configuration
-│   ├── prisma.ts        # Database client
-│   └── utils.ts         # Utility functions
-└── types/               # TypeScript definitions
+czToDo/
+├── @docs/                  # 📚 Documentation
+│   ├── INDEX.md           # Documentation index
+│   ├── QUICK_START.md     # Quick reference guide
+│   ├── TESTING_GUIDE.md   # Testing protocol
+│   └── ... (12 more docs)
+├── @scripts/              # 🛠️ Utility scripts
+│   ├── validate-extension.sh  # Extension validation
+│   └── debug-app.sh       # Debug helper
+├── extension/             # 🔌 Chrome Extension
+│   ├── popup/            # Popup UI (React)
+│   ├── options/          # Settings page (React)
+│   ├── background/       # Service Worker
+│   ├── content/          # Content scripts
+│   ├── dist/             # Compiled bundles
+│   └── manifest.json     # Extension manifest
+├── src/                  # 🌐 Web Application
+│   ├── app/             # Next.js App Router
+│   │   ├── api/         # API routes
+│   │   ├── auth/        # Auth pages
+│   │   └── dashboard/   # Main app
+│   ├── components/      # React components
+│   ├── lib/             # Utilities
+│   └── types/           # TypeScript types
+├── .github/workflows/   # 🤖 CI/CD
+│   ├── build.yml       # Build workflow
+│   └── validate.yml    # Validation workflow
+├── README.md           # Main readme
+└── package.json        # Dependencies
 ```
 
 ## 🔒 Security Features

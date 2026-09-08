@@ -36,8 +36,8 @@ jobs:
 
       - name: Validate extension
         run: |
-          chmod +x validate-extension.sh
-          ./validate-extension.sh
+          chmod +x @scripts/validate-extension.sh
+          ./@scripts/validate-extension.sh
 
       - name: Check for build artifacts
         run: |
