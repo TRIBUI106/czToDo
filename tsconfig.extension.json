@@ -11,7 +11,9 @@
     "sourceMap": true,
     "noImplicitAny": true,
     "skipLibCheck": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "noEmit": false
   },
   "include": ["extension/**/*"],
   "exclude": ["node_modules"]

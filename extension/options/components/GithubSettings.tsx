@@ -17,9 +17,12 @@ export default function GithubSettings({ onMessage }: GithubSettingsProps) {
 
   async function loadSettings() {
     try {
-      const result = await chrome.storage.local.get(['githubToken', 'githubUsername']);
-      setGithubToken(result.githubToken || '');
-      setGithubUsername(result.githubUsername || '');
+      const result = (await chrome.storage.local.get([
+        'githubToken',
+        'githubUsername',
+      ])) as Record<string, unknown>;
+      setGithubToken((result.githubToken as string) || '');
+      setGithubUsername((result.githubUsername as string) || '');
     } catch (err) {
       console.error('Failed to load GitHub settings:', err);
     }

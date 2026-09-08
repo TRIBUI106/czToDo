@@ -26,9 +26,11 @@ export default function NotificationSettings({ onMessage }: NotificationSettings
 
   async function loadPreferences() {
     try {
-      const result = await chrome.storage.local.get('notificationPreferences');
+      const result = (await chrome.storage.local.get(
+        'notificationPreferences'
+      )) as Record<string, unknown>;
       if (result.notificationPreferences) {
-        setPreferences(result.notificationPreferences);
+        setPreferences(result.notificationPreferences as NotificationPreferences);
       }
     } catch (err) {
       console.error('Failed to load notification preferences:', err);

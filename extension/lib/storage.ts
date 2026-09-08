@@ -6,8 +6,11 @@ import { AuthToken, ExtensionState, SyncQueueItem, Todo } from './types';
 export const storage = {
   // Sync storage (cross-device)
   async getTodos(): Promise<Todo[]> {
-    const result = await chrome.storage.sync.get('todos');
-    return result.todos || [];
+    const result = (await chrome.storage.sync.get('todos')) as Record<
+      string,
+      unknown
+    >;
+    return (result.todos as Todo[]) || [];
   },
 
   async setTodos(todos: Todo[]): Promise<void> {
@@ -19,8 +22,11 @@ export const storage = {
   },
 
   async getSyncStatus(): Promise<ExtensionState['syncStatus']> {
-    const result = await chrome.storage.sync.get('syncStatus');
-    return result.syncStatus || 'synced';
+    const result = (await chrome.storage.sync.get('syncStatus')) as Record<
+      string,
+      unknown
+    >;
+    return (result.syncStatus as ExtensionState['syncStatus']) || 'synced';
   },
 
   async setLastSyncTime(time: number): Promise<void> {
@@ -28,14 +34,20 @@ export const storage = {
   },
 
   async getLastSyncTime(): Promise<number> {
-    const result = await chrome.storage.sync.get('lastSyncTime');
-    return result.lastSyncTime || 0;
+    const result = (await chrome.storage.sync.get('lastSyncTime')) as Record<
+      string,
+      unknown
+    >;
+    return (result.lastSyncTime as number) || 0;
   },
 
   // Local storage (device-specific)
   async getAuthToken(): Promise<AuthToken | null> {
-    const result = await chrome.storage.local.get('authToken');
-    return result.authToken || null;
+    const result = (await chrome.storage.local.get('authToken')) as Record<
+      string,
+      unknown
+    >;
+    return (result.authToken as AuthToken) || null;
   },
 
   async setAuthToken(token: AuthToken | null): Promise<void> {
@@ -47,8 +59,11 @@ export const storage = {
   },
 
   async getSyncQueue(): Promise<SyncQueueItem[]> {
-    const result = await chrome.storage.local.get('syncQueue');
-    return result.syncQueue || [];
+    const result = (await chrome.storage.local.get('syncQueue')) as Record<
+      string,
+      unknown
+    >;
+    return (result.syncQueue as SyncQueueItem[]) || [];
   },
 
   async addToSyncQueue(item: SyncQueueItem): Promise<void> {
@@ -68,8 +83,11 @@ export const storage = {
   },
 
   async getOnlineStatus(): Promise<boolean> {
-    const result = await chrome.storage.local.get('isOnline');
-    return result.isOnline !== false; // default to online
+    const result = (await chrome.storage.local.get('isOnline')) as Record<
+      string,
+      unknown
+    >;
+    return (result.isOnline as boolean) !== false; // default to online
   },
 
   async setOnlineStatus(isOnline: boolean): Promise<void> {
@@ -77,8 +95,11 @@ export const storage = {
   },
 
   async getGitHubToken(): Promise<string | null> {
-    const result = await chrome.storage.local.get('githubToken');
-    return result.githubToken || null;
+    const result = (await chrome.storage.local.get('githubToken')) as Record<
+      string,
+      unknown
+    >;
+    return (result.githubToken as string) || null;
   },
 
   async setGitHubToken(token: string | null): Promise<void> {
@@ -93,8 +114,13 @@ export const storage = {
     lastSyncAt?: number;
     processedIssueIds?: string[];
   }> {
-    const result = await chrome.storage.local.get('githubSyncStatus');
-    return result.githubSyncStatus || {};
+    const result = (await chrome.storage.local.get(
+      'githubSyncStatus'
+    )) as Record<string, unknown>;
+    return (result.githubSyncStatus as {
+      lastSyncAt?: number;
+      processedIssueIds?: string[];
+    }) || {};
   },
 
   async setGitHubSyncStatus(status: {
